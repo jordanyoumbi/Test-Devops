@@ -1,0 +1,38 @@
+---
+- name: deploy a simple application
+  hosts: localhost
+  gather_facts: True
+  connection: local
+  tasks:   
+#    - name: install flask
+#      command: python -m pip install flask
+    - name: ansible install and flask
+      command: "{{ item }}"
+      with_items:
+#      - python3 -m venv env
+#      - source ./env/bin/activate
+#      - python -m pip install ansible
+      - sudo python -m pip install flask
+#    - name: git clone flask repo
+#      command: git clone https://github.com/silshack/flaskr.git
+    - name: build flask file
+      command: sudo python flaskr/flaskr.py 
+    - name: Ansible create file with content example
+      copy:
+        dest: "flaskr/templates/about.html"
+        content: |
+              <h2>About</h2>
+              <p>Here's a little about me</p>
+    - name: ansible add test on a file
+      blockinfile:
+          path: flaskr/flaskr.py
+          block: |
+              @app.route('/about')
+              def about():
+                  return render_template('about.html')
+    - name: add a line to your documentation
+      lineinfile:
+          path: flaskr/templates/layout.html
+          line: "   <a href=url_for('about')>about</a>"
+          insertafter: metanav.*
+#      when: url_for is defined
